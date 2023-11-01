@@ -46,3 +46,22 @@ Lookup secret.
 {{- printf "%s" $value -}}
 {{- end -}}
 {{- end -}}
+
+{{/* Templating the container runtime socket paths for neuvector */}}
+{{- define "helper.runtime" -}}
+  {{- if empty .Values.containerRuntime }}
+    {{- print "/var/run/docker.sock" -}}
+  {{- else if .Values.containerRuntime.customRunTimePath }} 
+    {{- print .Values.containerRuntime.runTimePath -}}
+  {{- else if contains .Values.containerRuntime.name "k3s" }}
+    {{- print "/run/k3s/containerd/containerd.sock" -}}
+  {{- else if contains .Values.containerRuntime.name "crio" }}
+    {{- print "/var/run/crio/crio.sock" -}}
+  {{- else if contains .Values.containerRuntime.name "containerd" }}
+    {{- print "/var/run/containerd/containerd.sock" -}}
+  {{- else if contains .Values.containerRuntime.name "bottlerocket" }}
+    {{- print "/run/dockershim.sock" -}}
+  {{- else }} 
+    {{- print "/var/run/docker.sock" -}}
+  {{end}}
+{{end}}
