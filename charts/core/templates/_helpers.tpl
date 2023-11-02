@@ -49,19 +49,24 @@ Lookup secret.
 
 {{/* Templating the container runtime socket paths for neuvector */}}
 {{- define "helper.runtime" -}}
-  {{- if empty .Values.containerRuntime }}
-    {{- print "/var/run/docker.sock" -}}
-  {{- else if .Values.containerRuntime.customRunTimePath }} 
-    {{- print .Values.containerRuntime.runTimePath -}}
-  {{- else if contains .Values.containerRuntime.name "k3s" }}
+  {{- $x_runtime := "" }}
+  {{- if .Values.containerRuntime -}}
+    {{- $x_runtime = .Values.containerRuntime.name -}}
+  {{ else -}}
+      {{- $x_runtime := "missing" -}}
+  {{end}}
+
+  {{- if eq $x_runtime "k3s" -}}
     {{- print "/run/k3s/containerd/containerd.sock" -}}
-  {{- else if contains .Values.containerRuntime.name "crio" }}
+  {{- else if eq $x_runtime "crio" -}}
     {{- print "/var/run/crio/crio.sock" -}}
-  {{- else if contains .Values.containerRuntime.name "containerd" }}
+  {{- else if eq $x_runtime "containerd" -}}
     {{- print "/var/run/containerd/containerd.sock" -}}
-  {{- else if contains .Values.containerRuntime.name "bottlerocket" }}
+  {{- else if eq $x_runtime "bottlerocket" -}}
     {{- print "/run/dockershim.sock" -}}
-  {{- else }} 
+  {{- else if eq $x_runtime "docker" -}} 
+    {{- print "/var/run/docker.sock" -}}
+  {{- else -}}
     {{- print "/var/run/docker.sock" -}}
   {{end}}
 {{end}}

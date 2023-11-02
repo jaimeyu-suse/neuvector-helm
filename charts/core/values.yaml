@@ -542,7 +542,7 @@ resources:
 
 containerRuntime:
   name: k3s
-  runTimePath: jaime/changeme
+  #runTimePath: jaime/changeme
   #/run/k3s/containerd/containerd.sock # default
 
 k3s:
