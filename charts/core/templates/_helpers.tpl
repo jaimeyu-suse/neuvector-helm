@@ -53,8 +53,19 @@ Lookup secret.
   {{- if .Values.containerRuntime -}}
     {{- $x_runtime = .Values.containerRuntime.name -}}
   {{ else -}}
-      {{- $x_runtime := "missing" -}}
-  {{end}}
+      {{- /* User did not configure the container runtime engine, 
+           * Attempting best effort detection of the runtime engine. 
+           */ -}}
+      {{- if contains "gke" .Capabilities.KubeVersion.Version  -}}
+        {{- $x_runtime = "containerd" -}}
+      {{- else if contains "k3s" .Capabilities.KubeVersion.Version  -}}
+        {{- $x_runtime = "k3s" -}}
+      {{- else if contains "rke2" .Capabilities.KubeVersion.Version  -}}
+        {{- $x_runtime = "k3s" -}}
+      {{- else -}}
+        {{- $x_runtime = "unknown" -}}
+      {{- end -}}
+  {{- end -}}
 
   {{- if eq $x_runtime "k3s" -}}
     {{- print "/run/k3s/containerd/containerd.sock" -}}
@@ -67,6 +78,7 @@ Lookup secret.
   {{- else if eq $x_runtime "docker" -}} 
     {{- print "/var/run/docker.sock" -}}
   {{- else -}}
+    {{- /* Assume docker fallback */ -}}
     {{- print "/var/run/docker.sock" -}}
   {{end}}
 {{end}}

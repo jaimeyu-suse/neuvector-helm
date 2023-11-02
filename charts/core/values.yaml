@@ -540,8 +540,8 @@ resources:
   #   memory: 2280Mi
   
 
-containerRuntime:
-  name: k3s
+# containerRuntime:
+  # name: k3s
   #runTimePath: jaime/changeme
   #/run/k3s/containerd/containerd.sock # default
 
