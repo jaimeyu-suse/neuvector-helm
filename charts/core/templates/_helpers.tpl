@@ -62,6 +62,8 @@ Lookup secret.
         {{- $x_runtime = "k3s" -}}
       {{- else if contains "rke2" .Capabilities.KubeVersion.Version  -}}
         {{- $x_runtime = "k3s" -}}
+      {{- else if contains "eks" .Capabilities.KubeVersion.Version  -}}
+        {{- $x_runtime = "containerd" -}}
       {{- else -}}
         {{- $x_runtime = "unknown" -}}
       {{- end -}}
