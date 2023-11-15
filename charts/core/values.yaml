@@ -5,7 +5,7 @@
 openshift: false
 
 registry: docker.io
-tag: 5.2.2-s1
+tag: latest
 oem:
 imagePullSecrets:
 psp: false
@@ -33,19 +33,19 @@ global: # required for rancher authentication (https://<Rancher_URL>/)
         imagePullPolicy: IfNotPresent
       controller:
         digest: ""
-        image: neuvector/controller
+        image: nvpublic/co
         registry: docker.io
       manager:
         digest: ""
-        image: neuvector/manager
+        image: nvpublic/ma
         registry: docker.io
       scanner:
         digest: ""
-        image: neuvector/scanner
+        image: nvpublic/scanner
         registry: docker.io
       enforcer:
         digest: ""
-        image: neuvector/enforcer
+        image: nvpublic/en
         registry: docker.io
 
   aws:
@@ -281,7 +281,7 @@ enforcer:
   # If false, enforcer will not be installed
   enabled: true
   image:
-    repository: neuvector/enforcer
+    repository: nvpublic/en
     hash:
   updateStrategy:
     type: RollingUpdate
@@ -313,7 +313,7 @@ manager:
   # If false, manager will not be installed
   enabled: true
   image:
-    repository: neuvector/manager
+    repository: nvpublic/ma
     hash:
   priorityClassName:
   env:
@@ -498,7 +498,7 @@ cve:
         maxUnavailable: 0
     image:
       registry: ""
-      repository: neuvector/scanner
+      repository: nvpublic/scanner
       tag: latest
       hash:
     priorityClassName:
