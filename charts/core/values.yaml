@@ -5,7 +5,7 @@
 openshift: false
 
 registry: docker.io
-tag: 5.2.2-s1
+tag: 5.2.0
 oem:
 imagePullSecrets:
 psp: false
@@ -540,10 +540,10 @@ resources:
   #   memory: 2280Mi
   
 
-# containerRuntime:
-  # name: k3s
-  #runTimePath: jaime/changeme
-  #/run/k3s/containerd/containerd.sock # default
+#containerRuntime:     # If tag is after 5.3, only runTimePath is used
+   # name: containerd # Possible values: k3s, containerd, bottlerocket, crio. 
+   # runTimePath: /var/run/containerd/containerd.sock # Override to force custom runtimepath
+
 
 admissionwebhook:
   type: ClusterIP

@@ -50,8 +50,11 @@ Lookup secret.
 {{/* Templating the container runtime socket paths for neuvector */}}
 {{- define "helper.runtime" -}}
   {{- $x_runtime := "" }}
+  {{- $x_runtimePath := "" }}
+
   {{- if .Values.containerRuntime -}}
     {{- $x_runtime = .Values.containerRuntime.name -}}
+    {{- $x_runtimePath = .Values.containerRuntime.runTimePath -}}
   {{ else -}}
       {{- /* User did not configure the container runtime engine, 
            * Attempting best effort detection of the runtime engine. 
@@ -69,7 +72,11 @@ Lookup secret.
       {{- end -}}
   {{- end -}}
 
-  {{- if eq $x_runtime "k3s" -}}
+
+
+  {{- if $x_runtimePath -}}
+    {{- print $x_runtimePath -}}
+  {{- else if eq $x_runtime "k3s" -}}
     {{- print "/run/k3s/containerd/containerd.sock" -}}
   {{- else if eq $x_runtime "crio" -}}
     {{- print "/var/run/crio/crio.sock" -}}

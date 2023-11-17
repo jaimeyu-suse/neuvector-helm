@@ -91,6 +91,7 @@ spec:
 {{- toYaml . | nindent 12 }}
           {{- end }}
           volumeMounts:
+          {{- if semverCompare "<5.3.0" .Values.tag }}
             - mountPath:  {{ include "helper.runtime" . | toString }}
               name: runtime-sock
               readOnly: true
@@ -100,6 +101,7 @@ spec:
             - mountPath: /host/cgroup
               name: cgroup-vol
               readOnly: true
+          {{- end }}
             - mountPath: /lib/modules
               name: modules-vol
               readOnly: true
@@ -123,6 +125,7 @@ spec:
       terminationGracePeriodSeconds: 1200
       restartPolicy: Always
       volumes:
+      {{- if semverCompare "<5.3.0" .Values.tag }}
         - name: runtime-sock
           hostPath:
             path: {{ include "helper.runtime" . | toString }}
@@ -132,6 +135,7 @@ spec:
         - name: cgroup-vol
           hostPath:
             path: /sys/fs/cgroup
+      {{- end }}
         - name: modules-vol
           hostPath:
             path: /lib/modules
