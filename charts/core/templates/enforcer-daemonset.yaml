@@ -101,6 +101,12 @@ spec:
             - mountPath: /host/cgroup
               name: cgroup-vol
               readOnly: true
+          {{- else if .Values.containerRuntime }}
+            {{- if .Values.containerRuntime.runTimePath }}
+            - mountPath: /run/runtime.sock
+              name: runtime-sock
+              readOnly: true  
+            {{ end }}
           {{- end }}
             - mountPath: /lib/modules
               name: modules-vol
@@ -135,6 +141,12 @@ spec:
         - name: cgroup-vol
           hostPath:
             path: /sys/fs/cgroup
+      {{- else if .Values.containerRuntime }}
+        {{- if .Values.containerRuntime.runTimePath }}
+        - name: runtime-sock
+          hostPath:
+            path: {{ .Values.containerRuntime.runTimePath }}
+        {{- end }}
       {{- end }}
         - name: modules-vol
           hostPath:
