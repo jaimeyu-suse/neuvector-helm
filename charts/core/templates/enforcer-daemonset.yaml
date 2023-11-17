@@ -91,25 +91,6 @@ spec:
 {{- toYaml . | nindent 12 }}
           {{- end }}
           volumeMounts:
-          {{- if .Values.containerd.enabled }}
-            - mountPath: /var/run/containerd/containerd.sock
-          {{- else if .Values.k3s.enabled }}
-            - mountPath: /run/containerd/containerd.sock
-          {{- else if .Values.bottlerocket.enabled }}
-            - mountPath: /var/run/containerd/containerd.sock
-          {{- else if .Values.crio.enabled }}
-            - mountPath: /var/run/crio/crio.sock
-          {{- else }}
-            - mountPath: /var/run/docker.sock
-          {{- end }}
-              name: runtime-sock
-              readOnly: true
-            - mountPath: /host/proc
-              name: proc-vol
-              readOnly: true
-            - mountPath: /host/cgroup
-              name: cgroup-vol
-              readOnly: true
             - mountPath: /lib/modules
               name: modules-vol
               readOnly: true
@@ -133,25 +114,9 @@ spec:
       terminationGracePeriodSeconds: 1200
       restartPolicy: Always
       volumes:
-        - name: runtime-sock
-          hostPath:
-          {{- if .Values.containerd.enabled }}
-            path: {{ .Values.containerd.path }}
-          {{- else if .Values.crio.enabled }}
-            path: {{ .Values.crio.path }}
-          {{- else if .Values.k3s.enabled }}
-            path: {{ .Values.k3s.runtimePath }}
-          {{- else if .Values.bottlerocket.enabled }}
-            path: {{ .Values.bottlerocket.runtimePath }}
-          {{- else }}
-            path: {{ .Values.docker.path }}
-          {{- end }}
         - name: proc-vol
           hostPath:
             path: /proc
-        - name: cgroup-vol
-          hostPath:
-            path: /sys/fs/cgroup
         - name: modules-vol
           hostPath:
             path: /lib/modules
