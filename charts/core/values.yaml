@@ -544,7 +544,7 @@ resources:
    # name: containerd # Possible values: k3s, containerd, bottlerocket, crio. 
   #  runTimePath: /var/run/containerd/containerd.sock # Override to force custom runtimepath
 
-# legacy
+# legacy. Leave the below disabled to use autodetection. 
 k3s:
   enabled: false
   runtimePath: /run/k3s/containerd/containerd.sock
@@ -560,7 +560,7 @@ containerd:
 crio:
   enabled: false
   path: /var/run/crio/crio.sock
-  
+
 admissionwebhook:
   type: ClusterIP
 
