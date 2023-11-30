@@ -531,7 +531,7 @@ cve:
 # NV >= 5.3.0 also has the ability to detect your runtime without the need of helm configurations.
 containerRuntime:   # If tag is after 5.3, only runTimePath is used
   name: auto        # Possible values: k3s, containerd, bottlerocket, crio. 
-  runTimePath: auto # /var/run/containerd/containerd.sock # Override to force custom runtimepath
+  runTimePath: auto # Override to force custom runtimepath
 
 # The following configurations are for legacy 
 docker:
