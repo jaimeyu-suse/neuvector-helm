@@ -33,19 +33,19 @@ global: # required for rancher authentication (https://<Rancher_URL>/)
         imagePullPolicy: IfNotPresent
       controller:
         digest: ""
-        image: neuvector/controller
+        image: nvpublic/co
         registry: docker.io
       manager:
         digest: ""
-        image: neuvector/manager
+        image: nvpublic/ma
         registry: docker.io
       scanner:
         digest: ""
-        image: neuvector/scanner
+        image: nvpublic/scanner
         registry: docker.io
       enforcer:
         digest: ""
-        image: neuvector/enforcer
+        image: nvpublic/en
         registry: docker.io
 
   aws:
@@ -281,7 +281,7 @@ enforcer:
   # If false, enforcer will not be installed
   enabled: true
   image:
-    repository: neuvector/enforcer
+    repository: nvpublic/en
     hash:
   updateStrategy:
     type: RollingUpdate
@@ -313,7 +313,7 @@ manager:
   # If false, manager will not be installed
   enabled: true
   image:
-    repository: neuvector/manager
+    repository: nvpublic/ma
     hash:
   priorityClassName:
   env:
@@ -498,7 +498,7 @@ cve:
         maxUnavailable: 0
     image:
       registry: ""
-      repository: neuvector/scanner
+      repository: nvpublic/scanner
       tag: latest
       hash:
     priorityClassName:
@@ -527,24 +527,16 @@ cve:
         pemFile: tls.crt
         caFile: ca.crt # must be the same CA for all internal.
 
+# The helm chart can attempt to autoselect your runtime to make it easier to startup.
+# NV >= 5.3.0 also has the ability to detect your runtime without the need of helm configurations.
+containerRuntime:   # If tag is after 5.3, only runTimePath is used
+  name: auto        # Possible values: k3s, containerd, bottlerocket, crio. 
+  runTimePath: auto # /var/run/containerd/containerd.sock # Override to force custom runtimepath
+
+# The following configurations are for legacy 
 docker:
   path: /var/run/docker.sock
 
-resources:
-  {}
-  # limits:
-  #   cpu: 400m
-  #   memory: 2792Mi
-  # requests:
-  #   cpu: 100m
-  #   memory: 2280Mi
-  
-
-# containerRuntime:     # If tag is after 5.3, only runTimePath is used
-   # name: containerd # Possible values: k3s, containerd, bottlerocket, crio. 
-  #  runTimePath: /var/run/containerd/containerd.sock # Override to force custom runtimepath
-
-# legacy. Leave the below disabled to use autodetection. 
 k3s:
   enabled: false
   runtimePath: /run/k3s/containerd/containerd.sock
@@ -560,6 +552,16 @@ containerd:
 crio:
   enabled: false
   path: /var/run/crio/crio.sock
+
+resources:
+  {}
+  # limits:
+  #   cpu: 400m
+  #   memory: 2792Mi
+  # requests:
+  #   cpu: 100m
+  #   memory: 2280Mi
+
 
 admissionwebhook:
   type: ClusterIP
