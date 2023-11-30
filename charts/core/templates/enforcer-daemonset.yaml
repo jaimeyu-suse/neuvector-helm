@@ -106,7 +106,6 @@ spec:
             {{- end }}
             {{- end }}
           {{- else if .Values.containerRuntime }}
-            # test: "runtime jaime"
             {{- if ne .Values.containerRuntime.runTimePath "auto" }}
             - mountPath: /run/runtime.sock
               name: runtime-sock
