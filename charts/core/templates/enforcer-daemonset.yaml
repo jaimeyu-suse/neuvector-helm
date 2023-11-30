@@ -91,7 +91,9 @@ spec:
 {{- toYaml . | nindent 12 }}
           {{- end }}
           volumeMounts:
-          {{- if semverCompare "<5.3.0" .Values.tag }}
+          {{- if regexMatch "^([0-9]+)\\.([0-9]+)\\.([0-9]+)(?:-([0-9A-Za-z-]+(?:\\.[0-9A-Za-z-]+)*))?(?:\\+[0-9A-Za-z-]+)?$" .Values.tag }}
+            {{- if semverCompare "<5.3.0" .Values.tag }}
+              {{- if eq .Values.containerRuntime.runTimePath "auto" }}
             - mountPath:  {{ include "helper.runtime" . | toString }}
               name: runtime-sock
               readOnly: true
@@ -101,8 +103,11 @@ spec:
             - mountPath: /host/cgroup
               name: cgroup-vol
               readOnly: true
+            {{- end }}
+            {{- end }}
           {{- else if .Values.containerRuntime }}
-            {{- if .Values.containerRuntime.runTimePath }}
+            # test: "runtime jaime"
+            {{- if ne .Values.containerRuntime.runTimePath "auto" }}
             - mountPath: /run/runtime.sock
               name: runtime-sock
               readOnly: true  
@@ -131,7 +136,9 @@ spec:
       terminationGracePeriodSeconds: 1200
       restartPolicy: Always
       volumes:
-      {{- if semverCompare "<5.3.0" .Values.tag }}
+        {{- if regexMatch "^([0-9]+)\\.([0-9]+)\\.([0-9]+)(?:-([0-9A-Za-z-]+(?:\\.[0-9A-Za-z-]+)*))?(?:\\+[0-9A-Za-z-]+)?$" .Values.tag }}
+          {{- if semverCompare "<5.3.0" .Values.tag }}
+            {{- if eq .Values.containerRuntime.runTimePath "auto" }}
         - name: runtime-sock
           hostPath:
             path: {{ include "helper.runtime" . | toString }}
@@ -141,12 +148,14 @@ spec:
         - name: cgroup-vol
           hostPath:
             path: /sys/fs/cgroup
+            {{- end }}
       {{- else if .Values.containerRuntime }}
-        {{- if .Values.containerRuntime.runTimePath }}
+        {{- if ne .Values.containerRuntime.runTimePath "auto" }}
         - name: runtime-sock
           hostPath:
             path: {{ .Values.containerRuntime.runTimePath }}
         {{- end }}
+      {{- end }}
       {{- end }}
         - name: modules-vol
           hostPath:

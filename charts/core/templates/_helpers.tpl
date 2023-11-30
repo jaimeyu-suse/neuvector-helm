@@ -92,7 +92,7 @@ Lookup secret.
 
 
 
-  {{- if $x_runtimePath -}}
+  {{- if ne $x_runtimePath "auto" -}}
     {{- print $x_runtimePath -}}
   {{- else if eq $x_runtime "k3s" -}}
     {{- print "/run/k3s/containerd/containerd.sock" -}}
