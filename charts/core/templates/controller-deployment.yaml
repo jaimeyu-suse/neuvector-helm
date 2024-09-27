@@ -154,17 +154,10 @@ spec:
             - mountPath: /var/nv_debug
               name: nv-debug
               readOnly: false
-          {{- if .Values.containerd.enabled }}
-            - mountPath: /var/run/containerd/containerd.sock
-          {{- else if .Values.k3s.enabled }}
-            - mountPath: /var/run/containerd/containerd.sock
-          {{- else if .Values.bottlerocket.enabled }}
-            - mountPath: /var/run/containerd/containerd.sock
-          {{- else if .Values.crio.enabled }}
-            - mountPath: /var/run/crio/crio.sock
-          {{- else }}
-            - mountPath: /var/run/docker.sock
-          {{- end }}
+          {{- if regexMatch "^([0-9]+)\\.([0-9]+)\\.([0-9]+)(?:-([0-9A-Za-z-]+(?:\\.[0-9A-Za-z-]+)*))?(?:\\+[0-9A-Za-z-]+)?$" .Values.tag }}
+            {{- if semverCompare "<5.3.0" .Values.tag }}
+              {{- if eq .Values.containerRuntime.runTimePath "auto" }}
+            - mountPath: {{ include "helper.runtime" . | toString }}
               name: runtime-sock
               readOnly: true
             - mountPath: /host/proc
@@ -173,6 +166,15 @@ spec:
             - mountPath: /host/cgroup
               name: cgroup-vol
               readOnly: true
+            {{- end }}
+            {{- end }}
+          {{- else if .Values.containerRuntime }}
+            {{- if ne .Values.containerRuntime.runTimePath "auto" }}
+            - mountPath: /run/runtime.sock
+              name: runtime-sock
+              readOnly: true  
+            {{ end }}
+          {{- end }}
             - mountPath: /etc/config
               name: config-volume
               readOnly: true
@@ -226,25 +228,27 @@ spec:
           hostPath:
             path: /var/neuvector
         {{- end }}
+          {{- if regexMatch "^([0-9]+)\\.([0-9]+)\\.([0-9]+)(?:-([0-9A-Za-z-]+(?:\\.[0-9A-Za-z-]+)*))?(?:\\+[0-9A-Za-z-]+)?$" .Values.tag }}
+            {{- if semverCompare "<5.3.0" .Values.tag }}
+              {{- if eq .Values.containerRuntime.runTimePath "auto" }}
         - name: runtime-sock
           hostPath:
-          {{- if .Values.containerd.enabled }}
-            path: {{ .Values.containerd.path }}
-          {{- else if .Values.crio.enabled }}
-            path: {{ .Values.crio.path }}
-          {{- else if .Values.k3s.enabled }}
-            path: {{ .Values.k3s.runtimePath }}
-          {{- else if .Values.bottlerocket.enabled }}
-            path: {{ .Values.bottlerocket.runtimePath }}
-          {{- else }}
-            path: {{ .Values.docker.path }}
-          {{- end }}
+            path:  {{ include "helper.runtime" . | toString }}
         - name: proc-vol
           hostPath:
             path: /proc
         - name: cgroup-vol
           hostPath:
             path: /sys/fs/cgroup
+      {{- end }}
+      {{- end }}
+      {{- else if .Values.containerRuntime }}
+        {{- if ne .Values.containerRuntime.runTimePath "auto" }}
+        - name: runtime-sock
+          hostPath:
+            path: {{ .Values.containerRuntime.runTimePath }}
+        {{- end }}
+      {{- end }}
         - name: config-volume
           projected:
             sources:

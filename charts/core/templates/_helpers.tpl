@@ -46,3 +46,66 @@ Lookup secret.
 {{- printf "%s" $value -}}
 {{- end -}}
 {{- end -}}
+
+{{/* Templating the container runtime socket paths for neuvector */}}
+{{- define "helper.runtime" -}}
+  {{- $x_runtime := "" }}
+  {{- $x_runtimePath := "" }}
+
+  {{- if .Values.containerRuntime -}}
+    {{- $x_runtime = .Values.containerRuntime.name -}}
+    {{- $x_runtimePath = .Values.containerRuntime.runTimePath -}}
+  {{/* Keep legacy support for old helm configs */}}
+  {{- else if .Values.k3s.enabled -}}
+    {{- $x_runtime = "k3s" -}}
+    {{- $x_runtimePath = .Values.k3s.runtimePath -}}
+  {{- else if .Values.bottlerocket.enabled -}}
+    {{- $x_runtime = "dockershim" -}}
+    {{- $x_runtimePath = .Values.bottlerocket.runtimePath -}}
+  {{- else if .Values.containerd.enabled -}}
+    {{- $x_runtime = "containerd" -}}
+    {{- $x_runtimePath = .Values.containerd.path -}}
+  {{- else if .Values.crio.enabled -}}
+    {{- $x_runtime = "crio" -}}
+    {{- $x_runtimePath = .Values.crio.path -}}
+  {{/* Autodetection support */}}
+  {{ else -}}
+      {{- /* User did not configure the container runtime engine, 
+           * Attempting best effort detection of the runtime engine. 
+           */ -}}
+      {{- if contains "gke" .Capabilities.KubeVersion.Version  -}}
+        {{- $x_runtime = "containerd" -}}
+      {{- else if contains "bottlerocket" .Capabilities.KubeVersion.Version  -}}
+        {{- $x_runtime = "dockershim" -}}
+      {{- else if contains "crio" .Capabilities.KubeVersion.Version  -}}
+        {{- $x_runtime = "crio" -}}
+      {{- else if contains "k3s" .Capabilities.KubeVersion.Version  -}}
+        {{- $x_runtime = "k3s" -}}
+      {{- else if contains "rke2" .Capabilities.KubeVersion.Version  -}}
+        {{- $x_runtime = "k3s" -}}
+      {{- else if contains "eks" .Capabilities.KubeVersion.Version  -}}
+        {{- $x_runtime = "containerd" -}}
+      {{- else -}}
+        {{- $x_runtime = "unknown" -}}
+      {{- end -}}
+  {{- end -}}
+
+
+
+  {{- if ne $x_runtimePath "auto" -}}
+    {{- print $x_runtimePath -}}
+  {{- else if eq $x_runtime "k3s" -}}
+    {{- print "/run/k3s/containerd/containerd.sock" -}}
+  {{- else if eq $x_runtime "crio" -}}
+    {{- print "/var/run/crio/crio.sock" -}}
+  {{- else if eq $x_runtime "containerd" -}}
+    {{- print "/var/run/containerd/containerd.sock" -}}
+  {{- else if eq $x_runtime "docker" -}}
+    {{- print "/var/run/docker.sock" -}}
+  {{- else if eq $x_runtime "dockershim" -}} 
+    {{- print "/run/dockershim.sock" -}}
+  {{- else -}}
+    {{- /* Assume docker fallback */ -}}
+    {{- print "/var/run/docker.sock" -}}
+  {{end}}
+{{end}}
